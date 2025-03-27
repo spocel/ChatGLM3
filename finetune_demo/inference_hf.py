@@ -28,7 +28,7 @@ def load_model_and_tokenizer(model_dir: Union[str, Path]) -> tuple[ModelType, To
     model_dir = _resolve_path(model_dir)
     if (model_dir / 'adapter_config.json').exists():
         model = AutoPeftModelForCausalLM.from_pretrained(
-            model_dir, trust_remote_code=True, device_map='auto'
+            model_dir, trust_remote_code=True
         )
         tokenizer_dir = model.peft_config['default'].base_model_name_or_path
     else:
@@ -39,6 +39,8 @@ def load_model_and_tokenizer(model_dir: Union[str, Path]) -> tuple[ModelType, To
     tokenizer = AutoTokenizer.from_pretrained(
         tokenizer_dir, trust_remote_code=True
     )
+    # 将模型移动到 GPU 上
+    model = model.cuda()
     return model, tokenizer
 
 

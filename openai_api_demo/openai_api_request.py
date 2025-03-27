@@ -56,12 +56,11 @@ def simple_chat(use_stream=True):
     messages = [
         {
             "role": "system",
-            "content": "You are ChatGLM3, a large language model trained by Zhipu.AI. Follow the user's "
-                       "instructions carefully. Respond using markdown.",
+            "content": "你是一个医疗咨询助手  你可以回答患者的医疗类问题，也可以提供一些心理健康建议。"
         },
         {
             "role": "user",
-            "content": "你好，请你用生动的话语给我讲一个小故事吧"
+            "content": "患者：医生，我感觉我有点抑郁，我该怎么办？"
         }
     ]
     response = client.chat.completions.create(
@@ -95,5 +94,5 @@ def embedding():
 if __name__ == "__main__":
     simple_chat(use_stream=False)
     simple_chat(use_stream=True)
-    embedding()
-    function_chat()
+    #embedding()
+    #function_chat()
