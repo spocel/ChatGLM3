@@ -51,8 +51,9 @@ from sse_starlette.sse import EventSourceResponse
 EventSourceResponse.DEFAULT_PING_INTERVAL = 1000
 
 # set LLM path
-MODEL_PATH = os.environ.get('MODEL_PATH', 'THUDM/chatglm3-6b')
+MODEL_PATH = os.environ.get('MODEL_PATH', '/root/dir')  # 使用本地模型路径
 TOKENIZER_PATH = os.environ.get("TOKENIZER_PATH", MODEL_PATH)
+LORA_PATH = os.environ.get("LORA_PATH", '/root/ChatGLM3/lora_models')  # 使用本地LoRA权重路径
 
 # set Embedding Model path
 EMBEDDING_PATH = os.environ.get('EMBEDDING_PATH', 'BAAI/bge-m3')
@@ -528,9 +529,21 @@ def contains_custom_function(value: str) -> bool:
 
 if __name__ == "__main__":
     # Load LLM
+    # 加载分词器
     tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH, trust_remote_code=True)
-    model = AutoModel.from_pretrained(MODEL_PATH, trust_remote_code=True, device_map="auto").eval()
+    
+    # 加载基础模型
+    base_model = AutoModel.from_pretrained(MODEL_PATH, trust_remote_code=True, device_map="auto")
+    
+    # 加载LoRA权重
+    from peft import PeftModel
+    model = PeftModel.from_pretrained(
+        base_model,
+        LORA_PATH,
+        trust_remote_code=True,
+        device_map="auto"
+    ).eval()
 
     # load Embedding
-    embedding_model = SentenceTransformer(EMBEDDING_PATH, device="cuda")
+    # embedding_model = SentenceTransformer(EMBEDDING_PATH, device="cuda")
     uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
